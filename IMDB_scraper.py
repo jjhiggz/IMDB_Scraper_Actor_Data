@@ -2,11 +2,13 @@ from bs4 import BeautifulSoup as _bs
 from requests import get
 from IPython import embed
 import pprint
+from create_file import create_actor_file 
+
 pp = pprint.PrettyPrinter(indent=1)
 
 # change this input to the IMDB url for the actor you want data in
 
-input = 'https://www.imdb.com/name/nm0000156/?ref_=fn_al_nm_1'
+input = 'https://www.imdb.com/name/nm3836977/?ref_=tt_cl_t1'
 
 url = get(input)
 content = url.content
@@ -15,10 +17,14 @@ projects = parsed.find_all(class_="filmo-row")
 header = parsed.find(class_="header")
 
 # the initial actor data dictionary which gets updated as you run the file
+
+
 actor_data = {
   "name": header.find(class_="itemprop").getText(strip=True),
   "age": 0,
-  "image": parsed.find(id="name-poster")['src'],
+  "image": parsed.find(id="name-poster")['src'] if parsed.find(id="name-poster") else '',
+  "projects": {},
+  "project_references": []
 }
 
 # this function will acquire the data for a given project (movie, show, ect...)
@@ -66,6 +72,6 @@ for project in projects:
   actor_data["project_references"] = [ *(actor_data["project_references"]), project_name ]
 
 # this embed() is just a debugger. It will turn your command line into an interactive playground to work with actor_data
-
+create_actor_file(actor_data)
 # here you could figure out how to store to a database, or process the data in some other way
-embed()
+# create_actor_file(actor_data)
